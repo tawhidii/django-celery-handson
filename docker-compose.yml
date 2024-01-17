@@ -7,10 +7,10 @@ services:
   django:
     container_name: django
     build:
-      context: ./
+      context: ./dj_celery
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./:/usr/src/app
+      - ./dj_celery:/usr/src/app
     ports:
       - 8001:8000
     environment:
@@ -23,10 +23,10 @@ services:
   celery:
     container_name: celery-1
     build:
-      context: ./
-    command: celery --app=dj_celery worker -l INFO
+      context: ./dj_celery
+    command: celery --app=dj_celery worker -l INFO -Q queue1
     volumes:
-      - ./:/usr/src/app/
+      - ./dj_celery:/usr/src/app/
     environment:
       - DEBUG=1
       - SECRET_KEY=secret-key-celery
@@ -40,7 +40,7 @@ services:
     build: 
       context: ./celeryworker
       dockerfile: Dockerfile
-    command: celery -A  celerytask worker --loglevel=INFO
+    command: celery -A  celerytask worker --loglevel=INFO -Q queue2
     volumes:
       - ./celeryworker:/usr/src/app/
     depends_on:
